@@ -2,9 +2,10 @@
 data/raw/*
 data/processed/*
 data/models/*
+!data/models/rf_model.pkl
 !data/**/.gitkeep
-*.pkl
 *.joblib
+!data/models/rf_model.pkl
 
 # Runtime state and reports
 data/enforcement_state.json

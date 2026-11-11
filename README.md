@@ -48,7 +48,24 @@ The enforcement engine runs iptables through sudo. Allow this for the iptables b
 <user> ALL=(ALL) NOPASSWD: /usr/sbin/iptables
 ```
 
-## Usage
+## Quick demo with the included sample
+
+The repository includes a small sample of the cleaned dataset (`data/sample/cicids2017_sample.csv`,
+3,167 flows covering all 15 traffic classes: 2,409 benign and 758 attack flows) and the trained
+model used in the thesis (`data/models/rf_model.pkl`, 78 features), so the system can be run
+without downloading CICIDS2017 or retraining.
+
+```bash
+mkdir -p data/processed
+cp data/sample/cicids2017_sample.csv data/processed/cicids2017_cleaned.csv
+python3 src/dashboard_phase5.py                      # terminal 1, then open http://localhost:8000
+python3 src/integration_detection_enforcement_v3.py  # terminal 2
+```
+
+With the sample, the replay uses a smaller held-out set than in the thesis (about 120 flows instead of 300).
+Do not run the training script on the sample: it would overwrite the thesis model with one trained on 3,167 flows.
+
+## Usage (full dataset)
 
 All commands are run from the repository root.
 
@@ -105,7 +122,8 @@ src/            source code
 tests/          automated tests (pytest)
 data/raw/       CICIDS2017 CSV files (not included)
 data/processed/ cleaned dataset (generated)
-data/models/    trained model (generated)
+data/sample/    sample of the cleaned dataset (3,167 flows, all classes)
+data/models/    trained model used in the thesis
 docs/diagrams/  architecture, runtime and training diagrams (PNG and draw.io)
 docs/screenshots/ screenshots used in the thesis
 ```
