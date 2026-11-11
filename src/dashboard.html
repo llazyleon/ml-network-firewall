@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ML Firewall Dashboard</title>
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #1e3a5f;
+    color: #1a1a1a;
+    padding: 24px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .header h1 {
+    margin: 0 0 6px 0;
+    color: #1e3a5f;
+    font-size: 28px;
+  }
+  .header p {
+    margin: 0;
+    color: #555;
+  }
+  .stats-row {
+    display: flex;
+    gap: 20px;
+  }
+  .stat-card {
+    flex: 1;
+    border-left: 4px solid #2196f3;
+    padding: 16px 20px;
+  }
+  .stat-card .label {
+    color: #888;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-card .value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #1e3a5f;
+  }
+  #statsJson {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #333;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .conn-status {
+    font-size: 12px;
+    color: #888;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card header">
+    <h1>🔥 ML Firewall Dashboard</h1>
+    <p>Real-time Attack Detection &amp; Enforcement</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="card stat-card">
+      <div class="label">Total Flows</div>
+      <div class="value" id="totalFlows">0</div>
+    </div>
+    <div class="card stat-card">
+      <div class="label">Attacks</div>
+      <div class="value" id="attackFlows">0</div>
+    </div>
+    <div class="card stat-card">
+      <div class="label">IPs Blocked</div>
+      <div class="value" id="ipsBlocked">0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Statistics</h3>
+    <div id="statsJson">Loading...</div>
+    <div class="conn-status" id="connStatus">Connecting...</div>
+  </div>
+
+<script>
+function renderStats(data) {
+  document.getElementById('totalFlows').textContent = data.total_flows ?? 0;
+  document.getElementById('attackFlows').textContent = data.attack_flows ?? 0;
+  document.getElementById('ipsBlocked').textContent = (data.blocked_ips || []).length;
+  document.getElementById('statsJson').textContent = JSON.stringify(data);
+}
+
+// Initial load via REST, in case WebSocket takes a moment to connect
+fetch('/api/stats')
+  .then(r => r.json())
+  .then(renderStats)
+  .catch(() => {
+    document.getElementById('statsJson').textContent = 'Could not reach /api/stats';
+  });
+
+// Live updates via WebSocket
+const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
+
+ws.onopen = () => {
+  document.getElementById('connStatus').textContent = 'Live (connected)';
+};
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  renderStats(data);
+};
+ws.onerror = () => {
+  document.getElementById('connStatus').textContent = 'Connection error - falling back to manual refresh';
+};
+ws.onclose = () => {
+  document.getElementById('connStatus').textContent = 'Disconnected';
+};
+</script>
+
+</body>
+</html>
