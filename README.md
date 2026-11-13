@@ -51,11 +51,12 @@ The enforcement engine runs iptables through sudo. Allow this for the iptables b
 ## Quick demo with the included sample
 
 The repository includes a small sample of the cleaned dataset (`data/sample/cicids2017_sample.csv`,
-3,167 flows covering all 15 traffic classes: 2,409 benign and 758 attack flows) and the trained
-model used in the thesis (`data/models/rf_model.pkl`, 78 features), so the system can be run
-without downloading CICIDS2017 or retraining.
+3,167 flows covering all 15 traffic classes: 2,409 benign and 758 attack flows). The trained model
+used in the thesis (`rf_model.pkl`, 78 features) is supplied in the thesis submission folder; place it
+in `data/models/`, or recreate it from the full dataset with the training script (see Usage below).
 
 ```bash
+# with rf_model.pkl in data/models/
 mkdir -p data/processed
 cp data/sample/cicids2017_sample.csv data/processed/cicids2017_cleaned.csv
 python3 src/dashboard_phase5.py                      # terminal 1, then open http://localhost:8000
@@ -123,7 +124,7 @@ tests/          automated tests (pytest)
 data/raw/       CICIDS2017 CSV files (not included)
 data/processed/ cleaned dataset (generated)
 data/sample/    sample of the cleaned dataset (3,167 flows, all classes)
-data/models/    trained model used in the thesis
+data/models/    trained model (supplied in the submission folder, or generated)
 docs/diagrams/  architecture, runtime and training diagrams (PNG and draw.io)
 docs/screenshots/ screenshots used in the thesis
 ```
